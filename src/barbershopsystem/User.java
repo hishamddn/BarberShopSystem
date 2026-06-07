@@ -6,15 +6,32 @@ package barbershopsystem;
 
 /**
  *
- * @author ADMIN
+ * @author MOHAMAD HISHAMUDDIN 
  */
 public class User{
     String name;
     String phoneNumber;
+    String username;
+    String password;
+    String role;
     
-    public User(String name, String phoneNumber){
+    public User(String name, String phoneNumber, String username, String password, String role){
         this.name = name;
         this.phoneNumber = phoneNumber;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+    
+    public String getName(){return name;}
+    public String getPhoneNumber(){return phoneNumber;}
+    public String getUsername(){return username;}
+    public String getPassword(){return password;}
+    public String getRole(){return role;}
+    
+    @Override
+    public String toString(){
+        return name + "," + phoneNumber + "," + username + "," + password + "," + role;
     }
     
 }
