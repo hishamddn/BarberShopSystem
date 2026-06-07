@@ -16,7 +16,7 @@ public class Customer extends User {
     private static int idCounter = 1;
 
     public Customer(String name, String phoneNumber, String email) {
-        super(name, phoneNumber);
+        super(name, phoneNumber, "", "", "Customer");
         this.custID = idCounter++;
         this.email = email;
     }
