@@ -59,6 +59,3 @@ public class Barber extends User {
         }
     }
 }
-
-//hisyam g4y
-//hisham poke
