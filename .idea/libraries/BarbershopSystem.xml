@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="BarbershopSystem">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/BarbershopSystem.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
