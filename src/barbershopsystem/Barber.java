@@ -26,16 +26,19 @@ public class Barber extends User {
         this.status = status;
     }
 
-    public String getName() {
-        return name; // inherited from User
+    public void setStatus(boolean status) {
+        this.status = status;
     }
-
     public String getStaffID() {
         return staffID;
     }
-
     public boolean getStatus() {
         return status;
+    }
+    
+    @Override
+    public String toString(){
+        return staffID + "," + name + "," + phoneNumber + "," + status;
     }
 
     public static ArrayList<Barber> getBarberList() {
