@@ -15,11 +15,20 @@ public class Customer extends User {
 
     private static int idCounter = 1;
 
-    public Customer(String name, String phoneNumber, String email) {
-        super(name, phoneNumber, "", "", "Customer");
-        this.custID = idCounter++;
-        this.email = email;
-    }
+    // existing constructor for new customers
+public Customer(String name, String phoneNumber, String email) {
+    super(name, phoneNumber, "", "", "Customer");
+    this.custID = idCounter++;
+    this.email = email;
+}
+
+// new constructor for loading from file
+public Customer(String name, String phoneNumber, String email, int custID) {
+    super(name, phoneNumber, "", "", "Customer");
+    this.custID = custID;
+    if (custID >= idCounter) idCounter = custID + 1; // keep counter in sync
+    this.email = email;
+}
 
     public Appointment bookAppointment(Barber barber, Service service, String dateTime) {
         Appointment appointment = new Appointment(this, barber, service, dateTime);
