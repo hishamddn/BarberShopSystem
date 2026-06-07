@@ -12,6 +12,16 @@ public class Service {
     private boolean shave;
     private double basePrice;
 
+    private static int counter = 1;
+
+    public Service(String haircutType, boolean shave, double basePrice) {
+        this.serviceID = "S00" + counter++;
+        this.haircutType = haircutType;
+        this.shave = shave;
+        this.basePrice = basePrice;
+    }
+
+    // for loading from file
     public Service(String serviceID, String haircutType, boolean shave, double basePrice) {
         this.serviceID = serviceID;
         this.haircutType = haircutType;
@@ -46,5 +56,10 @@ public class Service {
         System.out.println("Haircut      : " + haircutType);
         System.out.println("Shave        : " + (shave ? "Yes (+RM3)" : "No"));
         System.out.println("Total Price  : RM" + calculatePrice());
+    }
+    
+    @Override
+    public String toString() {
+        return serviceID + "," + haircutType + "," + shave + "," + basePrice;
     }
 }
