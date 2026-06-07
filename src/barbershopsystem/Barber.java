@@ -11,8 +11,17 @@ public class Barber extends User {
     private String staffID;
     private boolean status;
 
+    private static int counter = 1;
+
+    public Barber(String name, String phoneNumber, boolean status) {
+        super(name, phoneNumber, "", "", "Barber");
+        this.staffID = "B00" + counter++;
+        this.status = status;
+    }
+    
+    // for loading from file
     public Barber(String staffID, String name, String phoneNumber, boolean status) {
-        super(name, phoneNumber);
+        super(name, phoneNumber, "", "", "Barber");
         this.staffID = staffID;
         this.status = status;
     }
