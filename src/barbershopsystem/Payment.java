@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package barbershopsystem;
 
 /**
@@ -10,28 +6,65 @@ package barbershopsystem;
  */
 
 public class Payment {
+
     private static int counter = 1;
 
     private String paymentID;
-    private int appointmentID;  // changed to int to match Appointment
+    private int    appointmentID;
     private double amount;
     private String paymentMethod;
-    private String status;      // changed to String
+    private String status;
+
 
     public Payment(int appointmentID, double amount, String paymentMethod) {
-        this.paymentID = "PAY" + counter++;
+        this.paymentID     = "PAY" + counter++;
         this.appointmentID = appointmentID;
-        this.amount = amount;
+        this.amount        = amount;
         this.paymentMethod = paymentMethod;
-        this.status = "Paid";
+        this.status        = "Paid";
     }
 
-    public void refund() {
+ 
+    public Payment(String paymentID, int appointmentID,
+                   double amount, String paymentMethod, String status) {
+        this.paymentID     = paymentID;
+        this.appointmentID = appointmentID;
+        this.amount        = amount;
+        this.paymentMethod = paymentMethod;
+        this.status        = status;
+
+    
+        try {
+            int loadedNum = Integer.parseInt(paymentID.replace("PAY", ""));
+            if (loadedNum >= counter) counter = loadedNum + 1;
+        } catch (NumberFormatException ignored) { }
+    }
+
+    public static void setCounter(int value) {
+        counter = value;
+    }
+
+    public static int getCounter() {
+        return counter;
+    }
+
+    // -------------------------------------------------------
+    // Core actions
+    // -------------------------------------------------------
+    public void refund() {    //update to refund
         this.status = "Refunded";
         System.out.println("Payment " + paymentID + " has been refunded.");
     }
 
-    public void paymentDetails() {
+ 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+
+    // Display
+
+    public void paymentDetails() {      //display full payment
         System.out.println("Payment ID    : " + paymentID);
         System.out.println("Appointment ID: " + appointmentID);
         System.out.println("Amount        : RM" + amount);
@@ -39,9 +72,42 @@ public class Payment {
         System.out.println("Status        : " + status);
     }
 
-    public String getPaymentID() { return paymentID; }
-    public int getAppointmentID() { return appointmentID; }
-    public double getAmount() { return amount; }
+
+    @Override
+    public String toString() {
+        return paymentID
+             + "|" + appointmentID
+             + "|" + amount
+             + "|" + paymentMethod
+             + "|" + status;
+    }
+
+
+    public static Payment fromString(String line) {
+        if (line == null || line.trim().isEmpty()) return null;
+
+        String[] p = line.split("\\|", -1);
+        if (p.length < 5) return null;
+
+        try {
+            String paymentID     = p[0].trim();
+            int    appointmentID = Integer.parseInt(p[1].trim());
+            double amount        = Double.parseDouble(p[2].trim());
+            String paymentMethod = p[3].trim();
+            String status        = p[4].trim();
+
+            return new Payment(paymentID, appointmentID, amount, paymentMethod, status);
+
+        } catch (Exception e) {
+            System.out.println("Warning: could not parse payment line -> " + line);
+            return null;
+        }
+    }
+
+  
+    public String getPaymentID()     { return paymentID; }
+    public int    getAppointmentID() { return appointmentID; }
+    public double getAmount()        { return amount; }
     public String getPaymentMethod() { return paymentMethod; }
-    public String getStatus() { return status; }
+    public String getStatus()        { return status; }
 }

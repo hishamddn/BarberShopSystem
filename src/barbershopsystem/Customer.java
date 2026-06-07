@@ -15,7 +15,7 @@ public class Customer extends User {
 
     private static int idCounter = 1;
 
-    // existing constructor for new customers
+// constructor for new customers
 public Customer(String name, String phoneNumber, String email) {
     super(name, phoneNumber, "", "", "Customer");
     this.custID = idCounter++;

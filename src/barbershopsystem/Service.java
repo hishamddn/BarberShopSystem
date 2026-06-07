@@ -14,6 +14,7 @@ public class Service {
 
     private static int counter = 1;
 
+    // for creating new service
     public Service(String haircutType, boolean shave, double basePrice) {
         this.serviceID = "S00" + counter++;
         this.haircutType = haircutType;
@@ -30,11 +31,7 @@ public class Service {
     }
 
     public double calculatePrice() {
-        double total = basePrice;
-        if (shave) {
-            total += 3.0;
-        }
-        return total;
+        return shave ? basePrice + 3.0 : basePrice;
     }
 
     // added so Appointment.getDetails() works
@@ -42,7 +39,7 @@ public class Service {
         return haircutType + (shave ? " + Shave" : "");
     }
 
-    // added so Payment and main program works
+    
     public double getPrice() {
         return calculatePrice();
     }
@@ -51,6 +48,12 @@ public class Service {
         return serviceID;
     }
 
+    public boolean isShave() { return shave; }
+    
+    public String getHaircutType() { return haircutType; }
+    
+    
+    
     public void displayService() {
         System.out.println("Service ID   : " + serviceID);
         System.out.println("Haircut      : " + haircutType);
