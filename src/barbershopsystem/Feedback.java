@@ -41,6 +41,11 @@ public class Feedback {
     public int getRating() { return rating; }
     public String getComment() { return comment; }
     public String getDate() { return date; }
+    
+    @Override
+    public String toString() {
+        return feedbackID + "," + customerName + "," + barberName + "," + rating + "," + comment + "," + date;
+    }
 }
 
 
