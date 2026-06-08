@@ -13,15 +13,16 @@ public class Barber extends User {
 
     private static int counter = 1;
 
-    public Barber(String name, String phoneNumber, boolean status) {
-        super(name, phoneNumber, "", "", "Barber");
+    // for admin creating new barber with login credentials
+    public Barber(String name, String phoneNumber, String username, String password, boolean status) {
+        super(name, phoneNumber, username, password, "Barber");
         this.staffID = "B00" + counter++;
         this.status = status;
     }
     
     // for loading from file
-    public Barber(String staffID, String name, String phoneNumber, boolean status) {
-        super(name, phoneNumber, "", "", "Barber");
+    public Barber(String staffID, String name, String phoneNumber, String username, String password, boolean status) {
+        super(name, phoneNumber, username, password, "Barber");
         this.staffID = staffID;
         this.status = status;
     }
@@ -38,16 +39,17 @@ public class Barber extends User {
     
     @Override
     public String toString(){
-        return staffID + "," + name + "," + phoneNumber + "," + status;
+        return staffID + "," + name + "," + phoneNumber + "," + username + "," + password + "," + status;
     }
 
     public static ArrayList<Barber> getBarberList() {
         ArrayList<Barber> listBarber = new ArrayList<>();
-        listBarber.add(new Barber("B001", "Ali", "0128729700", true));
-        listBarber.add(new Barber("B002", "Abu", "0183617000", true));
-        listBarber.add(new Barber("B003", "Ahmad", "0179371000", true));
-        listBarber.add(new Barber("B004", "Alan", "0118317000", true));
-        listBarber.add(new Barber("B005", "Amin", "0191318000", true));
+
+        listBarber.add(new Barber("B001", "Muhamamd Ali", "0128729700", "ali", "1234", true));
+        listBarber.add(new Barber("B002", "Abu Hasan", "0183617000", "abu", "4567", true));
+        listBarber.add(new Barber("B003", "Ahmad", "0179371000", "ahmad", "4321", true));
+        listBarber.add(new Barber("B004", "Alan Walker", "0118317000", "alan", "7654", true));
+        listBarber.add(new Barber("B005", "Aminuddin", "0191318000", "amin", "7890", true));
         return listBarber;
     }
 

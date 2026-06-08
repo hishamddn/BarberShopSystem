@@ -57,15 +57,18 @@ public class Appointment {
         this.dateTime = newDateTime;
         System.out.println("Appointment " + appointmentID + " updated successfully.");
     }
+
+    public void markInProgress() {
+        this.status = "In Progress";
+        System.out.println("Appointment " + appointmentID + " is now in progress.");
+    }
  
  
     public void setStatus(String status) {
         this.status = status;
     }
- 
-    // -------------------------------------------------------
-    // Display
-    // -------------------------------------------------------
+
+    //get details and display in main program
     public String getDetails() {
         return "Appointment ID : " + appointmentID
              + "\nCustomer      : " + customer.getName()
@@ -76,26 +79,17 @@ public class Appointment {
              + "\nStatus        : " + status;
     }
  
-   
+
+    //for save the data in appointment file
     @Override
     public String toString() {
-        return appointmentID
-             + "|" + customer.getCustID()
-             + "|" + customer.getName()
-             + "|" + customer.getPhoneNumber()
-             + "|" + customer.getEmail()
-             + "|" + barber.getStaffID()
-             + "|" + barber.getName()
-             + "|" + barber.getPhoneNumber()
-             + "|" + service.getServiceID()
-             + "|" + service.getServiceName()   
-             + "|" + service.isShave()
-             + "|" + service.getPrice()
-             + "|" + dateTime
-             + "|" + status;
+        return appointmentID + "|" + customer.getCustID() + "|" + customer.getName() + "|" + customer.getPhoneNumber() + "|" + customer.getEmail()
+             + "|" + barber.getStaffID() + "|" + barber.getName() + "|" + barber.getPhoneNumber()
+             + "|" + service.getServiceID() + "|" + service.getServiceName() + "|" + service.isShave() + "|" + service.getPrice()
+             + "|" + dateTime + "|" + status;
     }
  
-    
+    //for load data from appointment file
     public static Appointment fromString(String line) {
         if (line == null || line.trim().isEmpty()) return null;
  
@@ -111,20 +105,22 @@ public class Appointment {
             String staffID      = p[5].trim();
             String barberName   = p[6].trim();
             String barberPhone  = p[7].trim();
-            String serviceID    = p[8].trim();
+            String barberUsername = p[8].trim();
+            String barberPass = p[9].trim();
+            String serviceID    = p[10].trim();
        
-            boolean shave       = Boolean.parseBoolean(p[10].trim());
-            double  basePrice   = Double.parseDouble(p[11].trim());
-            String  dateTime    = p[12].trim();
-            String  status      = p[13].trim();
+            boolean shave       = Boolean.parseBoolean(p[11].trim());
+            double  basePrice   = Double.parseDouble(p[12].trim());
+            String  dateTime    = p[13].trim();
+            String  status      = p[14].trim();
  
           
-            String serviceName  = p[9].trim();
+            String serviceName  = p[10].trim();
             String haircutType  = shave ? serviceName.replace(" + Shave", "").trim()
                                         : serviceName;
  
             Customer customer = new Customer(custName, custPhone, custEmail, custID);
-            Barber   barber   = new Barber(staffID, barberName, barberPhone, true);
+            Barber   barber   = new Barber(staffID, barberName, barberUsername, barberPass, true);
             Service  service  = new Service(serviceID, haircutType, shave, basePrice);
  
             return new Appointment(aptID, customer, barber, service, dateTime, status); // Return the new appointment date
