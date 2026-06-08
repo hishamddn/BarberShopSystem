@@ -74,7 +74,6 @@ public class BarbershopSystem {
     // ADMIN FLOW
     // =====================================================
     private static void adminFlow(Scanner sc) {
-        // login
         Admin currentAdmin = null;
         int attempts = 0;
 
@@ -103,7 +102,6 @@ public class BarbershopSystem {
 
         System.out.println("\nWelcome, " + currentAdmin.getName() + "!\n");
 
-        // admin dashboard
         boolean adminRunning = true;
         while (adminRunning) {
             printAdminDashboard();
@@ -160,7 +158,6 @@ public class BarbershopSystem {
     // BARBER FLOW
     // =====================================================
     private static void barberFlow(Scanner sc) {
-        // login
         Barber currentBarber = null;
         int attempts = 0;
 
@@ -190,10 +187,8 @@ public class BarbershopSystem {
 
         System.out.println("\nWelcome, " + currentBarber.getName() + "!\n");
 
-        // barber dashboard
         boolean barberRunning = true;
         while (barberRunning) {
-            // get this barber's appointments
             ArrayList<Appointment> myAppointments = getAppointmentsForBarber(currentBarber.getName());
 
             long myBooked     = myAppointments.stream().filter(a -> a.getStatus().equals("Booked")).count();
@@ -201,7 +196,7 @@ public class BarbershopSystem {
             long myCompleted  = myAppointments.stream().filter(a -> a.getStatus().equals("Completed")).count();
 
             System.out.println("\n╔══════════════════════════════════════╗");
-            System.out.println("║         BARBER DASHBOARD             ║");
+            System.out.println("║          BARBER DASHBOARD            ║");
             System.out.println("╠══════════════════════════════════════╣");
             System.out.printf( "║  My Appointments    : %-15d║%n", myAppointments.size());
             System.out.printf( "║  Booked             : %-15d║%n", myBooked);
@@ -210,14 +205,14 @@ public class BarbershopSystem {
             System.out.println("╠══════════════════════════════════════╣");
             System.out.println("║  1. View My Schedule                 ║");
             System.out.println("║  2. Mark Appointment as In Progress  ║");
-            System.out.println("║  3. Logout                           ║");
+            System.out.println("║  3. Complete & Collect Payment       ║");
+            System.out.println("║  4. Logout                           ║");
             System.out.println("╚══════════════════════════════════════╝");
-            System.out.print("Select option (1-3): ");
-            int choice = getValidInt(sc, 1, 3);
+            System.out.print("Select option (1-4): ");
+            int choice = getValidInt(sc, 1, 4);
 
             switch (choice) {
                 case 1 -> {
-                    // view my schedule
                     if (myAppointments.isEmpty()) {
                         System.out.println("No appointments assigned to you.");
                     } else {
@@ -229,34 +224,65 @@ public class BarbershopSystem {
                     }
                 }
                 case 2 -> {
-                    // mark as in progress
                     ArrayList<Appointment> bookedApts = new ArrayList<>();
                     for (Appointment apt : myAppointments) {
                         if (apt.getStatus().equals("Booked")) bookedApts.add(apt);
                     }
-                    if (bookedApts.isEmpty()) {
-                        System.out.println("No booked appointments to mark.");
-                        break;
-                    }
+                    if (bookedApts.isEmpty()) { System.out.println("No booked appointments."); break; }
                     System.out.println("\n=== Booked Appointments ===");
                     for (Appointment apt : bookedApts) {
                         System.out.println("-----------------------------");
                         System.out.println(apt.getDetails());
                     }
-                    System.out.print("Enter Appointment ID to mark In Progress: ");
+                    System.out.print("Enter Appointment ID: ");
                     int aptID = getValidInt(sc, 1, Integer.MAX_VALUE);
                     Appointment apt = findAppointment(aptID);
-                    if (apt == null || !apt.getBarber().getName().equals(currentBarber.getName())) {
+                    if (apt == null || !apt.getBarber().getStaffID().equals(currentBarber.getStaffID())) {
                         System.out.println("Appointment not found in your schedule.");
-                    } else if (!apt.getStatus().equals("Booked")) {
-                        System.out.println("Only booked appointments can be marked in progress.");
                     } else {
                         apt.markInProgress();
                         FileHandler.saveAppointments(appointmentList);
-                        System.out.println("Appointment marked as In Progress.");
+                        System.out.println("Marked as In Progress.");
                     }
                 }
                 case 3 -> {
+                    ArrayList<Appointment> activeApts = new ArrayList<>();
+                    for (Appointment apt : myAppointments) {
+                        if (apt.getStatus().equals("In Progress") || apt.getStatus().equals("Booked")) {
+                            activeApts.add(apt);
+                        }
+                    }
+                    if (activeApts.isEmpty()) { System.out.println("No active appointments to complete."); break; }
+                    System.out.println("\n=== Active Appointments ===");
+                    for (Appointment apt : activeApts) {
+                        System.out.println("-----------------------------");
+                        System.out.println(apt.getDetails());
+                    }
+                    System.out.print("Enter Appointment ID to complete: ");
+                    int completeID = getValidInt(sc, 1, Integer.MAX_VALUE);
+                    Appointment toComplete = findAppointment(completeID);
+                    if (toComplete == null || !toComplete.getBarber().getStaffID().equals(currentBarber.getStaffID())) {
+                        System.out.println("Appointment not found in your schedule.");
+                    } else {
+                        toComplete.setStatus("Completed");
+                        System.out.println("\nTotal: RM" + toComplete.getService().getPrice());
+                        System.out.println("1. Cash  2. Card  3. E-Wallet");
+                        System.out.print("Payment method: ");
+                        int payChoice = getValidInt(sc, 1, 3);
+                        String[] methods = {"Cash", "Card", "E-Wallet"};
+                        Payment payment = new Payment(
+                                toComplete.getAppointmentID(),
+                                toComplete.getService().getPrice(),
+                                methods[payChoice - 1]
+                        );
+                        paymentList.add(payment);
+                        FileHandler.saveAppointments(appointmentList);
+                        FileHandler.savePayments(paymentList);
+                        System.out.println("\n=== Payment Collected ===");
+                        payment.paymentDetails();
+                    }
+                }
+                case 4 -> {
                     System.out.println("Logged out.\n");
                     barberRunning = false;
                 }
@@ -267,10 +293,67 @@ public class BarbershopSystem {
     // =====================================================
     // CUSTOMER FLOW
     // =====================================================
+
     private static void customerFlow(Scanner sc) {
+        System.out.println("\n=== Customer ===");
+        System.out.println("1. Book Appointment");
+        System.out.println("2. Leave Feedback");
+        System.out.print("Select (1-2): ");
+        int choice = getValidInt(sc, 1, 2);
+
+        if (choice == 1) {
+            bookCustomerAppointment(sc);
+        } else {
+            leaveCustomerFeedback(sc);
+        }
+    }
+
+    private static void leaveCustomerFeedback(Scanner sc) {
+        System.out.println("\n=== Leave Feedback ===");
+        System.out.print("Enter your Appointment ID: ");
+        int aptID = getValidInt(sc, 1, Integer.MAX_VALUE);
+        Appointment apt = findAppointment(aptID);
+
+        if (apt == null) {
+            System.out.println("Appointment ID not found.");
+        } else if (!apt.getStatus().equals("Completed")) {
+            System.out.println("Feedback only allowed after service is completed.");
+            System.out.println("Current status: " + apt.getStatus());
+        } else {
+            // check if feedback already submitted for this appointment
+            for (Feedback f : feedbackList) {
+                if (f.getCustomerName().equals(apt.getCustomer().getName()) &&
+                        f.getBarberName().equals(apt.getBarber().getName())) {
+                    System.out.println("Feedback already submitted for this appointment.");
+                    return;
+                }
+            }
+            System.out.println("Appointment found: " + apt.getDetails());
+            System.out.print("Enter rating (1-5): ");
+            int rating = getValidInt(sc, 1, 5);
+            System.out.print("Enter comment     : ");
+            String comment = sc.nextLine();
+            String today = java.time.LocalDate.now().toString();
+            String feedbackID = "F" + (feedbackList.size() + 1);
+
+            Feedback feedback = new Feedback(
+                    feedbackID,
+                    apt.getCustomer().getName(),
+                    apt.getBarber().getName(),
+                    rating,
+                    comment,
+                    today
+            );
+            feedback.submitFeedback();
+            feedbackList.add(feedback);
+            FileHandler.saveFeedbacks(feedbackList);
+            System.out.println("\nThank you for your feedback!");
+            System.out.println(feedback.getDetails());
+        }
+    }
+    private static void bookCustomerAppointment(Scanner sc) {
         System.out.println("\n=== Customer Booking Form ===");
 
-        // customer details
         System.out.print("Enter your name        : ");
         String custName = sc.nextLine();
         System.out.print("Enter your phone number: ");
@@ -280,7 +363,6 @@ public class BarbershopSystem {
 
         Customer customer = new Customer(custName, custPhone, custEmail);
 
-        // select barber
         if (barberList.isEmpty()) {
             System.out.println("No barbers available. Please contact the shop.");
             return;
@@ -292,7 +374,6 @@ public class BarbershopSystem {
         Barber selectedBarber = barberList.get(barberChoice);
         System.out.println("Selected: " + selectedBarber.getName());
 
-        // select service
         System.out.println("\n=== Available Services ===");
         System.out.println("1. Crop Cut   - RM15.00");
         System.out.println("2. Fade Cut   - RM18.00");
@@ -324,11 +405,18 @@ public class BarbershopSystem {
         System.out.println("\nService summary:");
         selectedService.displayService();
 
-        // date and time
         System.out.print("\nEnter preferred date & time (e.g. 2025-06-10 10:00AM): ");
         String dateTime = sc.nextLine();
 
-        // create appointment
+        // 1. Check for schedule conflict before booking
+        if (hasScheduleConflict(selectedBarber, dateTime)) {
+            System.out.println("\nSorry, " + selectedBarber.getName() +
+                    " already has an appointment at " + dateTime + ".");
+            System.out.println("Please choose a different time or barber.");
+            return;
+        }
+
+        // 2. Only reaches here if no conflict
         Appointment appointment = customer.bookAppointment(selectedBarber, selectedService, dateTime);
         appointmentList.add(appointment);
         FileHandler.saveAppointments(appointmentList);
@@ -382,6 +470,14 @@ public class BarbershopSystem {
 
         System.out.print("Date & time: ");
         String dateTime = sc.nextLine();
+
+        // Check for schedule conflict before booking
+        if (hasScheduleConflict(selectedBarber, dateTime)) {
+            System.out.println("\nSorry, " + selectedBarber.getName() +
+                    " already has an appointment at " + dateTime + ".");
+            System.out.println("Please choose a different time or barber.");
+            return;
+        }
 
         Appointment apt = customer.bookAppointment(selectedBarber, selectedService, dateTime);
         appointmentList.add(apt);
@@ -474,9 +570,11 @@ public class BarbershopSystem {
             System.out.println("\n=== Manage Barbers ===");
             System.out.println("1. View all barbers");
             System.out.println("2. Add new barber");
-            System.out.println("3. Back");
-            System.out.print("Select (1-3): ");
-            int choice = getValidInt(sc, 1, 3);
+            System.out.println("3. Edit barber");
+            System.out.println("4. Delete barber");
+            System.out.println("5. Back");
+            System.out.print("Select (1-5): ");
+            int choice = getValidInt(sc, 1, 5);
 
             switch (choice) {
                 case 1 -> {
@@ -485,30 +583,91 @@ public class BarbershopSystem {
                     } else {
                         System.out.println("\n=== Barber List ===");
                         for (Barber b : barberList) {
-                            System.out.println("ID: " + b.getStaffID() +
-                                    " | Name: " + b.getName() +
-                                    " | Phone: " + b.getPhoneNumber() +
-                                    " | Username: " + b.getUsername() +
-                                    " | Status: " + (b.getStatus() ? "Available" : "Unavailable"));
+                            System.out.println(
+                                    "ID: " + b.getStaffID() +
+                                            " | Name: " + b.getName() +
+                                            " | Phone: " + b.getPhoneNumber() +
+                                            " | Username: " + b.getUsername() +
+                                            " | Status: " + (b.getStatus() ? "Available" : "Unavailable")
+                            );
                         }
                     }
                 }
                 case 2 -> {
-                    System.out.print("Barber name    : ");
+                    System.out.print("Barber name  : ");
                     String bName = sc.nextLine();
-                    System.out.print("Phone number   : ");
+                    System.out.print("Phone number : ");
                     String bPhone = sc.nextLine();
-                    System.out.print("Set username   : ");
+                    System.out.print("Username     : ");
                     String bUsername = sc.nextLine();
-                    System.out.print("Set password   : ");
+                    System.out.print("Password     : ");
                     String bPassword = sc.nextLine();
-
                     Barber newBarber = new Barber(bName, bPhone, bUsername, bPassword, true);
                     barberList.add(newBarber);
                     FileHandler.saveBarbers(barberList);
                     System.out.println("Barber added! ID: " + newBarber.getStaffID());
                 }
-                case 3 -> managing = false;
+                case 3 -> {
+                    if (barberList.isEmpty()) { System.out.println("No barbers to edit."); break; }
+                    System.out.print("Enter Staff ID to edit: ");
+                    String editID = sc.nextLine().trim();
+                    Barber toEdit = findBarber(editID);
+                    if (toEdit == null) {
+                        System.out.println("Barber not found.");
+                    } else {
+                        System.out.println("Editing: " + toEdit.getName());
+                        System.out.print("New name (enter to keep '" + toEdit.getName() + "'): ");
+                        String newName = sc.nextLine().trim();
+                        System.out.print("New phone (enter to keep '" + toEdit.getPhoneNumber() + "'): ");
+                        String newPhone = sc.nextLine().trim();
+                        System.out.print("New username (enter to keep '" + toEdit.getUsername() + "'): ");
+                        String newUsername = sc.nextLine().trim();
+                        System.out.print("New password (enter to keep current): ");
+                        String newPassword = sc.nextLine().trim();
+                        System.out.print("Available? (yes/no): ");
+                        boolean newStatus = sc.nextLine().trim().equalsIgnoreCase("yes");
+
+                        if (!newName.isEmpty())     toEdit.setName(newName);
+                        if (!newPhone.isEmpty())    toEdit.setPhoneNumber(newPhone);
+                        if (!newUsername.isEmpty()) toEdit.setUsername(newUsername);
+                        if (!newPassword.isEmpty()) toEdit.setPassword(newPassword);
+                        toEdit.setStatus(newStatus);
+
+                        FileHandler.saveBarbers(barberList);
+                        System.out.println("Barber updated successfully.");
+                    }
+                }
+                case 4 -> {
+                    if (barberList.isEmpty()) { System.out.println("No barbers to delete."); break; }
+                    System.out.print("Enter Staff ID to delete: ");
+                    String deleteID = sc.nextLine().trim();
+                    Barber toDelete = findBarber(deleteID);
+                    if (toDelete == null) {
+                        System.out.println("Barber not found.");
+                    } else {
+                        boolean hasActive = false;
+                        for (Appointment apt : appointmentList) {
+                            if (apt.getBarber().getStaffID().equals(deleteID) &&
+                                    (apt.getStatus().equals("Booked") || apt.getStatus().equals("In Progress"))) {
+                                hasActive = true;
+                                break;
+                            }
+                        }
+                        if (hasActive) {
+                            System.out.println("Cannot delete. Barber has active appointments.");
+                        } else {
+                            System.out.print("Confirm delete " + toDelete.getName() + "? (yes/no): ");
+                            if (sc.nextLine().trim().equalsIgnoreCase("yes")) {
+                                barberList.remove(toDelete);
+                                FileHandler.saveBarbers(barberList);
+                                System.out.println("Barber deleted.");
+                            } else {
+                                System.out.println("Delete cancelled.");
+                            }
+                        }
+                    }
+                }
+                case 5 -> managing = false;
             }
         }
     }
@@ -546,6 +705,24 @@ public class BarbershopSystem {
         FileHandler.saveAppointments(appointmentList);
         FileHandler.savePayments(paymentList);
         FileHandler.saveFeedbacks(feedbackList);
+    }
+
+    private static Barber findBarber(String staffID) {
+        for (Barber b : barberList) {
+            if (b.getStaffID().equals(staffID)) return b;
+        }
+        return null;
+    }
+
+    private static boolean hasScheduleConflict(Barber barber, String dateTime) {
+        for (Appointment apt : appointmentList) {
+            if (apt.getBarber().getStaffID().equals(barber.getStaffID()) &&
+                    apt.getDateTime().equalsIgnoreCase(dateTime) &&
+                    (apt.getStatus().equals("Booked") || apt.getStatus().equals("In Progress"))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Appointment findAppointment(int id) {

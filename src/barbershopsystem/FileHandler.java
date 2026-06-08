@@ -117,10 +117,14 @@ public class FileHandler {
 
                 if (appointment != null) {
                     appointments.add(appointment);
+                    // TRACK MAX ID HERE:
+                    if (appointment.getAppointmentID() > maxID) {
+                        maxID = appointment.getAppointmentID();
+                    }
                 }
             }
-            // sync counter so new appointments don't repeat IDs
-            if (maxID > 0) Appointment.setCounter(maxID + 1);
+            // Sync counter so new appointments don't repeat IDs
+            if (maxID > 0) Appointment.setCounter(maxID);
 
         } catch (IOException e) {
             System.out.println("Appointment file not found.");

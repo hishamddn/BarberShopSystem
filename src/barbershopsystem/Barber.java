@@ -42,6 +42,11 @@ public class Barber extends User {
         return staffID + "," + name + "," + phoneNumber + "," + username + "," + password + "," + status;
     }
 
+    public void setName(String name) { this.name = name; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+
     public static ArrayList<Barber> getBarberList() {
         ArrayList<Barber> listBarber = new ArrayList<>();
 
