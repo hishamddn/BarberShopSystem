@@ -1,0 +1,2 @@
+F1,aiman,Abu Hasan,5,nice haircut,2026-06-09
+F2,hisham,Abu Hasan,5,great barber,2026-06-09

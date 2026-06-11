@@ -17,6 +17,16 @@ public class BarbershopSystem {
         // load all data from files on startup
         adminList       = FileHandler.loadAdmins();
         barberList      = FileHandler.loadBarbers();
+        if (!barberList.isEmpty()) {
+            // Get the last barber in the list (e.g., B005)
+            String lastID = barberList.get(barberList.size() - 1).getStaffID();
+
+            // Extract the numeric part (removes "B" and parses "005" to integer 5)
+            int lastNumber = Integer.parseInt(lastID.substring(1));
+
+            // Set the counter to the next available number (e.g., 6)
+            Barber.setCounter(lastNumber + 1);
+        }
         appointmentList = FileHandler.loadAppointments();
         paymentList     = FileHandler.loadPayments();
         feedbackList    = FileHandler.loadFeedbacks();

@@ -1,0 +1,4 @@
+PAY1|1|18.0|Card|Paid
+PAY2|1|18.0|E-Wallet|Paid
+PAY3|1|15.0|E-Wallet|Paid
+PAY4|1|18.0|Cash|Paid

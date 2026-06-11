@@ -16,7 +16,9 @@ public class Barber extends User {
     // for admin creating new barber with login credentials
     public Barber(String name, String phoneNumber, String username, String password, boolean status) {
         super(name, phoneNumber, username, password, "Barber");
-        this.staffID = "B00" + counter++;
+
+        // %03d ensures the integer is padded with leading zeros to be at least 3 digits long
+        this.staffID = String.format("B%03d", counter++);
         this.status = status;
     }
     
@@ -25,6 +27,10 @@ public class Barber extends User {
         super(name, phoneNumber, username, password, "Barber");
         this.staffID = staffID;
         this.status = status;
+    }
+
+    public static void setCounter(int nextValue) {
+        counter = nextValue;
     }
 
     public void setStatus(boolean status) {
@@ -47,6 +53,7 @@ public class Barber extends User {
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
 
+    //Load default barber if there are no barber in file
     public static ArrayList<Barber> getBarberList() {
         ArrayList<Barber> listBarber = new ArrayList<>();
 
